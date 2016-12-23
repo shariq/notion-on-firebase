@@ -1,6 +1,6 @@
 # notion-on-firebase
 
-This project will scrape a `notion.so` page and its links, then rewrite your `firebase.json` file, then deploy to Firebase hosting.
+This project will scrape a `notion.so` page and its links, rewrite your `firebase.json` file with custom links, then deploy all that as static content to Firebase hosting.
 
 
 Live example:
@@ -10,9 +10,9 @@ Live example:
 
 ## Goal
 
-Super nice personal website builder.
+Super nice personal website builder
 
-Super nice means: WYSIWYG editor, beautiful without any work, trivial to restructure.
+Super nice means: WYSIWYG editor, beautiful without any work, trivial to restructure
 
 
 ## Story
@@ -102,4 +102,4 @@ Breakdown:
 
 ## Love
 
-to Simon for helping me out
+to Simon for helping me out <3

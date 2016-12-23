@@ -82,6 +82,14 @@ head.appendChild(script);
     driver.execute_script(script)
 
 
+def remove_manifest():
+    driver = get_driver()
+    script = '''
+document.getElementsByTagName('html')[0].removeAttribute('manifest');
+'''
+    driver.execute_script(script)
+
+
 def scrape_notion_page(page_id):
     driver = get_driver()
     driver.get('https://www.notion.so/' + page_id)
@@ -119,6 +127,7 @@ def scrape_notion_page(page_id):
         add_focus_handler(element)
 
     insert_analytics()
+    remove_manifest()
 
     time.sleep(1)
     html = driver.page_source

@@ -57,7 +57,7 @@ def postprocess(results_path='./results', rewrite_db_path='rewrite.db'):
     htmls = [open(path).read() for path in paths]
     rewrite_db = pickledb.load(rewrite_db_path, True)
     for page, html in zip(pages, htmls):
-        if not rewrite_db.get(page):
+        if rewrite_db.get(page) == None:
             print 'What should the short form of', page, 'be?'
             title_index = html.index('<title>')
             print '[only alphanumeric characters please]'

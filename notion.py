@@ -117,6 +117,7 @@ def scrape_notion_page(page_id):
     for element in href_elements:
         url = normalize_href_element(element)
         if is_notion_page(url):
+            set_element_attribute(element, 'target', '_self')
             notion_pages_encountered.append(url.split('/')[-1].split('-')[-1])
     for element in src_elements:
         normalize_href_element(element, 'src')

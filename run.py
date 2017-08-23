@@ -24,8 +24,6 @@ def add_to_firebase_json(firebase_path, new_rewrites):
     for new_rewrite in new_rewrites:
         for existing_rewrite in existing_rewrites[:]:
             if existing_rewrite['destination'] == new_rewrite['destination']:
-                if existing_rewrite['source'] == new_rewrite['source']:
-                    continue
                 print 'warning: removing', existing_rewrite
                 existing_rewrites.remove(existing_rewrite)
             elif existing_rewrite['source'] == new_rewrite['source']:

@@ -54,16 +54,6 @@ def normalize_href_element(element, attribute='href'):
     return normalized
 
 
-def add_focus_handler(element):
-    onmouseover = "this.classList.add('focused');"
-    onmouseout = "this.classList.remove('focused');"
-    onmouseout += "this.classList.remove('activated');"
-    onmousedown = "this.classList.add('activated');"
-    set_element_attribute(element, 'onmouseover', onmouseover)
-    set_element_attribute(element, 'onmouseout', onmouseout)
-    set_element_attribute(element, 'onmousedown', onmousedown)
-
-
 def delete_element(element):
     get_driver().execute_script(
         'arguments[0].parentNode.removeChild(arguments[0])', element)
@@ -90,14 +80,47 @@ document.getElementsByTagName('html')[0].removeAttribute('manifest');
     driver.execute_script(script)
 
 
-def scrape_notion_page(page_id):
+def remove_favicons():
+    driver = get_driver()
+    shortcut_icon_element = driver.find_element_by_xpath('//link[@rel="shortcut icon"]')
+    delete_element(shortcut_icon_element)
+    apple_touch_icon_element = driver.find_element_by_xpath('//link[@rel="apple-touch-icon"]')
+    delete_element(apple_touch_icon_element)
+
+
+def overwrite_meta_elements(meta_json):
+    driver = get_driver()
+    meta_elements = driver.find_elements_by_xpath('//meta')
+
+    for element in meta_elements:
+        element_name = element.get_attribute('name')
+        element_property = element.get_attribute('property')
+        if element_name:
+            if element_name in meta_json['name']:
+                meta_name = meta_json['name'][element_name]
+                if meta_name is None:
+                    # delete this meta element
+                    delete_element(element)
+                else:
+                    set_element_attribute(element, 'content', meta_name)
+        elif element_property:
+            if element_property in meta_json['property']:
+                meta_property = meta_json['property'][element_property]
+                if meta_property is None:
+                    # delete this meta element
+                    delete_element(element)
+                else:
+                    set_element_attribute(element, 'content', meta_property)
+
+
+def scrape_notion_page(page_id, meta_json={}):
     driver = get_driver()
     driver.get('https://www.notion.so/' + page_id)
-    time.sleep(5)
+    time.sleep(10)
     # should change this to instead use expected_conditions or webdriverwait
     # but it's so messy to wait on react rendering...
 
-    assert 'Docs, wikis, tasks, seamlessly in one.' not in driver.title
+    assert 'Docs, Wikis, Tasks. Seamlessly in one' not in driver.title
     # this is how we know the page is either invalid or we're not authenticated
     # there is probably a better way but HTTP status codes don't work...
     # fails anyways later on even if this assert doesn't trigger an error
@@ -106,8 +129,9 @@ def scrape_notion_page(page_id):
 
     login_element = driver.find_element_by_xpath('//a[@href="/login"]')
     script_elements = driver.find_elements_by_xpath('//script')
+    noscript_elements = driver.find_elements_by_xpath('//noscript')
 
-    for element in [login_element] + script_elements:
+    for element in [login_element] + script_elements + noscript_elements:
         delete_element(element)
 
     notion_pages_encountered = []
@@ -122,13 +146,10 @@ def scrape_notion_page(page_id):
     for element in src_elements:
         normalize_href_element(element, 'src')
 
-    focus_elements = driver.find_elements_by_xpath(
-        '//div[contains(@class, "darkenOnActive")]')
-    for element in focus_elements:
-        add_focus_handler(element)
-
     insert_analytics()
     remove_manifest()
+    remove_favicons()
+    overwrite_meta_elements(meta_json)
 
     time.sleep(1)
     html = driver.page_source

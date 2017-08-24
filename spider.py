@@ -12,7 +12,7 @@ notion.py can be found at http://github.com/shariq/notion-on-firebase
 '''
 
 
-def notion_spider(root_page):
+def notion_spider(root_page, meta_json={}):
     # page in this function means a notion page identifier
     # like b9b2d96c8e844556be0740771db875a3
 
@@ -28,7 +28,7 @@ def notion_spider(root_page):
             continue
         print 'now scraping', page
         try:
-            html, new_pages = notion.scrape_notion_page(page)
+            html, new_pages = notion.scrape_notion_page(page, meta_json=meta_json)
         except Exception:
             print 'encountered error while scraping', page
             traceback.print_exc()
@@ -89,8 +89,8 @@ def generate_rewrites(results_path='./results', rewrite_db_path='rewrite.db'):
     return rewrites
 
 
-def run(root_page, results_path='./results'):
-    results = notion_spider(root_page)
+def run(root_page, results_path='./results', meta_json={}):
+    results = notion_spider(root_page, meta_json=meta_json)
     dump_results(results, results_path)
     postprocess(results_path)
     rewrites = generate_rewrites(results_path)
